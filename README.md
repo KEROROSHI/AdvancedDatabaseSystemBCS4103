@@ -25,7 +25,7 @@ This project contains a complete database schema for an online retail system, in
 
 ### Prerequisites
 - PostgreSQL 12+ 
-- CSV data file (`online_retail_data.csv`)
+- CSV data files (`./database/inputs`)
 
 ### Database Setup
 
@@ -53,8 +53,9 @@ online-retail-database/
 ├── schema.sql              # Database structure
 ├── populate_data.sql       # Data import script
 ├── sample_queries.sql      # Example analytics queries
-└── data/
-    └── online_retail_data.csv
+└── database/
+    └── inputs
+         └── *.csv
 ```
 
 ## Data Processing
