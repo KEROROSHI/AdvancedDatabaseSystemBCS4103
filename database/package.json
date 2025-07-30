@@ -1,0 +1,10 @@
+{
+  "name": "olist-importer",
+  "version": "1.0.0",
+  "main": "import_olist_data.js",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "dotenv": "^16.0.0",
+    "pg": "^8.7.1"
+  }
+}
