@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Retail - Products</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Our Products</h1>
+    </header>
+    
+    <main>
+        <div class="product-filters">
+            <input type="text" id="search" placeholder="Search products...">
+            <select id="category-filter">
+                <option value="">All Categories</option>
+                <!-- Categories will be populated by JavaScript -->
+            </select>
+        </div>
+        
+        <div id="products-container" class="products-grid">
+            <!-- Products will be loaded here -->
+        </div>
+        
+        <div id="loading" class="loading">
+            <div class="loading-spinner"></div>
+            <span>Loading products...</span>
+        </div>
+    </main>
+    
+    <script src="/js/main.js"></script>
+</body>
+</html>
