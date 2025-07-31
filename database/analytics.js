@@ -26,5 +26,5 @@ async function getSales(start, end, country = null) {
   await client.end();
 }
 
-// ✅ Set new arguments here
-getSales("2018-01-01", "2018-12-31", "SP"); // or null
+// Set new arguments here
+getSales("2018-01-01", "2018-12-31", "SP");
