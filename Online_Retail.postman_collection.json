@@ -1,26 +1,101 @@
 {
 	"info": {
-		"_postman_id": "04b496ca-d770-4f86-8f89-ac7d58a02787",
-		"name": "Online_Retail",
+		"_postman_id": "84d18e1c-dac4-4f79-990f-4b5bd3422780",
+		"name": "Olist E-commerce API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "37915882"
 	},
 	"item": [
 		{
-			"name": "1. Customer Management APIs",
+			"name": "1. Customer Management",
 			"item": [
 				{
-					"name": "# Get all customers with pagination",
+					"name": "Get all customers (paginated)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response time is less than 200ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);",
+									"});",
+									"",
+									"",
+									"pm.test(\"Response schema matches the expected structure\", function () {",
+									"    const responseData = pm.response.json();",
+									"",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData).to.have.all.keys('success', 'data', 'pagination');",
+									"",
+									"    pm.expect(responseData.data).to.be.an('array');",
+									"    responseData.data.forEach(customer => {",
+									"        pm.expect(customer).to.be.an('object');",
+									"        pm.expect(customer).to.have.all.keys('customer_id', 'customer_unique_id', 'customer_zip_code_prefix', 'customer_city', 'customer_state');",
+									"        pm.expect(customer.customer_id).to.be.a('string');",
+									"        pm.expect(customer.customer_unique_id).to.be.a('string');",
+									"        pm.expect(customer.customer_zip_code_prefix).to.be.a('number');",
+									"        pm.expect(customer.customer_city).to.be.a('string');",
+									"        pm.expect(customer.customer_state).to.be.a('string');",
+									"    });",
+									"",
+									"    pm.expect(responseData.pagination).to.be.an('object');",
+									"    pm.expect(responseData.pagination).to.have.all.keys('page', 'limit', 'total');",
+									"    pm.expect(responseData.pagination.page).to.be.a('number');",
+									"    pm.expect(responseData.pagination.limit).to.be.a('number');",
+									"    pm.expect(responseData.pagination.total).to.be.a('number');",
+									"});",
+									"",
+									"",
+									"pm.test(\"Data field is an array and contains the expected number of customer objects\", function () {",
+									"    const responseData = pm.response.json();",
+									"",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.data).to.be.an('array').that.has.lengthOf(5, \"The data array should contain 5 customer objects\");",
+									"});",
+									"",
+									"",
+									"pm.test(\"Each customer object contains the required fields\", function () {",
+									"    const responseData = pm.response.json();",
+									"    ",
+									"    pm.expect(responseData).to.be.an('object');",
+									"    pm.expect(responseData.data).to.be.an('array').that.is.not.empty;",
+									"",
+									"    responseData.data.forEach(customer => {",
+									"        pm.expect(customer).to.have.all.keys('customer_id', 'customer_unique_id', 'customer_zip_code_prefix', 'customer_city', 'customer_state');",
+									"    });",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "http://localhost:3000/api/customers?page=1&limit=5",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/customers?page=1&limit=20",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"customers"
@@ -32,7 +107,7 @@
 								},
 								{
 									"key": "limit",
-									"value": "5"
+									"value": "20"
 								}
 							]
 						}
@@ -40,34 +115,29 @@
 					"response": []
 				},
 				{
-					"name": "GET Single Customer",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3000/api/customers/12346",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"api",
-								"customers",
-								"12346"
-							]
+					"name": "Create a new customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Customer created successfully\", () => {",
+									"    pm.response.to.have.status(201);",
+									"    pm.expect(pm.response.json().data).to.have.property('customer_id');",
+									"    pm.collectionVariables.set(\"customer_id\", pm.response.json().data.customer_id);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
 						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create New Customer",
+					],
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"customer_id\": 123458,\n    \"customer_name\": \"New Customer2\",\n    \"email\": \"new2@example.com\",\n    \"phone\": \"2345678901\",\n    \"country_id\": 1\n}",
+							"raw": "{\n  \"customer_id\": \"new1234\",\n  \"customer_unique_id\": \"unique1234\",\n  \"customer_zip_code_prefix\": 12345,\n  \"customer_city\": \"Sao Paulo\",\n  \"customer_state\": \"SP\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -75,40 +145,58 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/customers?Content-Type=application/json",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/customers",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"customers"
-							],
-							"query": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								}
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Update Customer",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
+					"name": "Get a specific customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200 OK\", () => pm.response.to.have.status(200));",
+									"pm.test(\"Has pagination data\", () => {",
+									"    const json = pm.response.json();",
+									"    pm.expect(json.pagination).to.exist;",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
 							}
-						],
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"customer_name\": \"Updated Name\",\n  \"email\": \"updated@example.com\"\n}\n",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -116,146 +204,27 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/customers/12346",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/customers/06b8999e2fba1a1fbc88172c00ba8bc7",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"customers",
-								"12346"
+								"06b8999e2fba1a1fbc88172c00ba8bc7"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Get Customer Orders",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3000/api/customers/123458/orders",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"api",
-								"customers",
-								"123458",
-								"orders"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "2. Product Catalog APIs",
-			"item": [
-				{
-					"name": "GET All Products (Filtered)",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3000/api/products?category=3&minPrice=10&maxPrice=100",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"api",
-								"products"
-							],
-							"query": [
-								{
-									"key": "category",
-									"value": "3"
-								},
-								{
-									"key": "minPrice",
-									"value": "10"
-								},
-								{
-									"key": "maxPrice",
-									"value": "100"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET Single Product",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3000/api/products/1",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"api",
-								"products",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create New Product",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"stock_code\": \"NEW1223\",\n    \"description\": \"New Product\",\n    \"category_id\": 5,\n    \"unit_price\": 29.99,\n    \"stock_quantity\": 50\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:3000/api/products?Content-Type=application/json",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"api",
-								"products"
-							],
-							"query": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Product",
+					"name": "Update a customer",
 					"request": {
 						"method": "PUT",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"stock_code\": \"NEW123\",\n    \"unit_price\": 34.99,\n    \"stock_quantity\": 45\n}",
+							"raw": "{\n  \"customer_city\": \"Rio de Janeir0\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -263,43 +232,73 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/products/10?Content-Type=application/json",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/customers/06b8999e2fba1a1fbc88172c00ba8bc7",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
-								"products",
-								"10"
-							],
-							"query": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								}
+								"customers",
+								"06b8999e2fba1a1fbc88172c00ba8bc7"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Delete Product",
+					"name": "Get customers by segment",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/customers/segment/Premium",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"customers",
+								"segment",
+								"Premium"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a customer's orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/customers/06b8999e2fba1a1fbc88172c00ba8bc7/orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"customers",
+								"06b8999e2fba1a1fbc88172c00ba8bc7",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a customer",
 					"request": {
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/api/products/12",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/customers/000598caf2ef4117407665ac33275130",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
-								"products",
-								"12"
+								"customers",
+								"000598caf2ef4117407665ac33275130"
 							]
 						}
 					},
@@ -308,172 +307,30 @@
 			]
 		},
 		{
-			"name": "3. Order Management APIs",
+			"name": "2. Order Management",
 			"item": [
 				{
-					"name": "GET All Orders (Filtered)",
+					"name": "1. List all orders (paginated)",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/api/orders?status=completed&startDate=2023-01-01",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/orders?page=1&limit=20",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"orders"
 							],
 							"query": [
 								{
-									"key": "status",
-									"value": "completed"
+									"key": "page",
+									"value": "1"
 								},
-								{
-									"key": "startDate",
-									"value": "2023-01-01"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET Single Order",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3000/api/orders/1",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"api",
-								"orders",
-								"1"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create New Order",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"customer_id\": 12346,\n  \"invoice_no\": \"636561\",\n  \"order_date\": \"2023-11-15T14:30:00Z\",\n  \"items\": [\n    {\n      \"product_id\": 1,\n      \"quantity\": 2\n    },\n    {\n      \"product_id\": 2,\n      \"quantity\": 1\n    }\n  ]\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:3000/api/orders?Content-Type=application/json",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"api",
-								"orders"
-							],
-							"query": [
-								{
-									"key": "Content-Type",
-									"value": "application/json"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Cancel Oder",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3000/api/orders/5",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"api",
-								"orders",
-								"5"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Drafts",
-			"item": []
-		},
-		{
-			"name": "4. Analytics APIs",
-			"item": [
-				{
-					"name": "Sales Summary",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3000/api/analytics/sales-summary?period=monthly",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"api",
-								"analytics",
-								"sales-summary"
-							],
-							"query": [
-								{
-									"key": "period",
-									"value": "monthly"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Top Products",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:3000/api/analytics/top-products?limit=3",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"api",
-								"analytics",
-								"top-products"
-							],
-							"query": [
 								{
 									"key": "limit",
-									"value": "3"
+									"value": "20"
 								}
 							]
 						}
@@ -481,38 +338,873 @@
 					"response": []
 				},
 				{
-					"name": "Customer Segments",
-					"request": {
-						"method": "GET",
-						"header": []
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "5. Health Check",
-			"item": [
-				{
-					"name": "Health",
+					"name": "2.2 Get a specific order",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3000/health",
-							"protocol": "http",
+							"raw": "{{base_url}}/api/orders/10a045cdf6a5650c21e9cfeb60384c16",
 							"host": [
-								"localhost"
+								"{{base_url}}"
 							],
-							"port": "3000",
 							"path": [
-								"health"
+								"api",
+								"orders",
+								"10a045cdf6a5650c21e9cfeb60384c16"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2.3. Create a new order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customer_id\": \"000379cdec625522490c315e70c7a9fb\",\n    \"order_status\": \"invoiced\",\n    \"items\": \n        [\n            {\"product_id\": \"00066f42aeeb9f3007548bb9d3f33c38\",\n            \"seller_id\": \"3442f8959a84dea7ee197c632cb2df15\",\n            \"price\": 100.0,\"freight_value\": 15.50\n            }\n        ],\n    \"payments\": \n        [\n            {\n                \"payment_sequential\": 1,\n                \"payment_type\": \"credit_card\",\n                \"payment_installments\": 3\n                ,\"payment_value\": 115.50\n            }\n        ],\n    \"reviews\": \n        [\n            {\n                \"review_score\": 5,\n                \"review_comment_title\": \"Great Product\",\n                \"review_comment_message\": \"Fast delivery and great quality.\"\n            }\n        ]\n}\n\n\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/orders/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"orders",
+								""
 							]
 						}
 					},
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "3. Product Catalog",
+			"item": [
+				{
+					"name": "3.1. List all products (paginated)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 201\", () => pm.response.to.have.status(201));",
+									"pm.collectionVariables.set(\"product_id\", pm.response.json().data.product_id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"product_id\": \"prod_test_001\",\n    \"product_category_name\": \"electronics\",\n    \"product_weight_g\": 500\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/products?page=1&limit=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3.2. Get a specific product",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products/1e9e8ef04dbcff4541ed26657ea517e5",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"1e9e8ef04dbcff4541ed26657ea517e5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3.3. Create a new product",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"product_category_name\": \"electronics\",\n    \"product_name_length\": 35,\n    \"product_description_length\": 500,\n    \"product_photos_qty\": 3,\n    \"product_weight_g\": 500,\n    \"product_length_cm\": 20,\n    \"product_height_cm\": 10,\n    \"product_width_cm\": 15,\n    \"stock\": 50\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/products?Content-Type=application/json",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3.4. Update a product",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"product_weight_g\": 600,\n    \"stock\": 45\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/products/1e9e8ef04dbcff4541ed26657ea517e5?Content-Type=application/json",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"1e9e8ef04dbcff4541ed26657ea517e5"
+							],
+							"query": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3.5. Delete a product",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products/1e9e8ef04dbcff4541ed26657ea517e5",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"1e9e8ef04dbcff4541ed26657ea517e5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3.7. Get products with low stock",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products/low-stock?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"low-stock"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3.6. Get products by category",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/products/category/electronics?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"category",
+								"electronics"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Sellers",
+			"item": [
+				{
+					"name": "4.1. List all sellers (paginated)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/sellers?page=1&limit=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"sellers"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4.2. Get a specific seller",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/sellers/d1b65fc7debc3361ea86b5f14c68d2e2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"sellers",
+								"d1b65fc7debc3361ea86b5f14c68d2e2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4.3. Create a new seller",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"seller_zip_code_prefix\": 22222,\n    \"seller_city\": \"Seller City\",\n    \"seller_state\": \"CA\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/sellers?Content-Type=application/json",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"sellers"
+							],
+							"query": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4.4. Update a seller",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"seller_city\": \"Updated Seller City\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/sellers/d1b65fc7debc3361ea86b5f14c68d2e2?Content-Type=application/json",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"sellers",
+								"d1b65fc7debc3361ea86b5f14c68d2e2"
+							],
+							"query": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4.5. Delete a seller",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/sellers/c0f3eea2e14555b6faeea3dd58c1b1c3",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"sellers",
+								"c0f3eea2e14555b6faeea3dd58c1b1c3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4.6. Get products sold by a seller",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/sellers/3442f8959a84dea7ee197c632cb2df15/products?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"sellers",
+								"3442f8959a84dea7ee197c632cb2df15",
+								"products"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Order-paymemts",
+			"item": [
+				{
+					"name": "5.1. List all payments (paginated)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/order-payments?page=1&limit=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"order-payments"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5.2. Get payments for a specific order",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/order-payments/47770eb9100c2d0c44946d9cf07ec65d",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"order-payments",
+								"47770eb9100c2d0c44946d9cf07ec65d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5.3. Create a new payment record",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order_id\": \"949d5b44dbf5de918fe9c16f97b45f8a\",\n    \"payment_sequential\": 2,\n    \"payment_type\": \"credit_card\",\n    \"payment_installments\": 3,\n    \"payment_value\": 150.75\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/order-payments?Content-Type=application/json",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"order-payments"
+							],
+							"query": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5.4. Update a payment record",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"payment_value\": 175.25\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/order-payments/a9810da82917af2d9aefd1278f1dcfa0/1?Content-Type=application/json",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"order-payments",
+								"a9810da82917af2d9aefd1278f1dcfa0",
+								"1"
+							],
+							"query": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5.5. Delete a payment record",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/order-payments/95442deb81a5d91c97c0df96b431634a/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"order-payments",
+								"95442deb81a5d91c97c0df96b431634a",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "6. Order Reviews",
+			"item": [
+				{
+					"name": "6.1. List all reviews (paginated)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/reviews?page=1&limit=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reviews"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6.2. Get a specific review by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/reviews/68269f64ba23702679b973a7c3834580",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reviews",
+								"68269f64ba23702679b973a7c3834580"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6.3. Create a new review",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"review_id\": \"new-unique-review-id\",\n    \"order_id\": \"e6ce16cb79ec1d90b1da9085a6118aeb\",\n    \"review_score\": 5,\n    \"review_comment_title\": \"Great Product\",\n    \"review_comment_message\": \"Very happy with this purchase. Fast shipping and excellent quality.\",\n    \"review_creation_date\": \"2018-05-18 10:30:18\",\n    \"review_answer_timestamp\": \"2018-05-19 11:45:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/reviews?Content-Type=application/json",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reviews"
+							],
+							"query": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6.4. Update a review",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"review_score\": 4,\n    \"review_comment_title\": \"Good Product\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/reviews/228ce5500dc1d8e020d8d1322874b6f0?Content-Type=application/json",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reviews",
+								"228ce5500dc1d8e020d8d1322874b6f0"
+							],
+							"query": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6.5. Delete a review",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/reviews/a3f6f7f6f433de0aefbb97da197c554c",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reviews",
+								"a3f6f7f6f433de0aefbb97da197c554c"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6.6. Get average review score for the last X days",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/reviews/average/30",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reviews",
+								"average",
+								"30"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "7. Analytics",
+			"item": [
+				{
+					"name": "7.1. Get sales data (with date range and country filters)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/sales?startDate=2018-01-01&endDate=2018-12-31&country=SP",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"sales"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2018-01-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2018-12-31"
+								},
+								{
+									"key": "country",
+									"value": "SP"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "7.2. Get customer segmentation data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/customer-segments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"customer-segments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "7.3. Get product performance metrics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/product-performance",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"product-performance"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "7.4. Get sales by geographic location",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/analytics/geographic",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"analytics",
+								"geographic"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"// Example: Set a base URL for all requests",
+					"pm.collectionVariables.set(\"base_url\", \"http://localhost:3000\");"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": ""
+		},
+		{
+			"key": "customer_id",
+			"value": ""
+		},
+		{
+			"key": "product_id",
+			"value": ""
 		}
 	]
 }
