@@ -80,6 +80,7 @@ const sellerRoutes = require('./routes/sellers');
 const orderpaymentsRoutes = require('./routes/order-payments');
 const reviewsRoutes = require('./routes/order-reviews');
 const analyticsRoutes = require('./routes/analytics');
+
 require('dotenv').config();
 
 // The database connection is now handled and exported by config/db.js,
@@ -91,6 +92,8 @@ const db = require('./config/db');
 // ----------------------
 const app = express();
 const port = 3000;
+
+const setupSwagger = require('./config/swagger');
 
 // Middleware to parse JSON request bodies.
 app.use(express.json());
@@ -111,6 +114,8 @@ app.use('/api/analytics', analyticsRoutes);
 app.get('/', (req, res) => {
   res.send('Olist API is running!');
 });
+
+setupSwagger(app);
 
 // ----------------------
 // 4. Server Start
