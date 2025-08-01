@@ -73,4 +73,3 @@ The system includes:
 - Geographic sales distribution
 - Seasonal trend analysis
 - Customer segmentation insights
-
