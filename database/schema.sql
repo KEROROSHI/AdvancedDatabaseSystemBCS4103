@@ -72,3 +72,19 @@ CREATE TABLE olist_order_items (
     freight_value FLOAT,
     PRIMARY KEY (order_id, order_item_id)
 );
+
+
+-- Customer Management Optimization
+CREATE INDEX idx_customer_orders ON olist_orders(customer_id, order_purchase_timestamp DESC);
+
+-- Product Catalog Optimization
+CREATE INDEX idx_product_category ON olist_products(product_category_name);
+CREATE INDEX idx_product_price ON olist_order_items(price);
+
+-- Order Management Optimization
+CREATE INDEX idx_order_status_date ON olist_orders(order_status, order_purchase_timestamp);
+CREATE INDEX idx_order_payments ON olist_order_payments(order_id);
+
+-- Analytics Optimization
+CREATE INDEX idx_order_timestamp ON olist_orders(order_purchase_timestamp);
+CREATE INDEX idx_review_score ON olist_order_reviews(review_score);
