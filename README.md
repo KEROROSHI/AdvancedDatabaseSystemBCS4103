@@ -74,3 +74,15 @@ The system includes:
 - Seasonal trend analysis
 - Customer segmentation insights
 
+* [API Documentation](#api-documentation)
+
+## Installation
+
+...
+
+## Usage
+
+...
+
+## API Documentation
+You can find detailed information about the API endpoints and how to use them in our [API Documentation](api-documentation.md).
